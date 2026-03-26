@@ -1,279 +1,200 @@
 <template>
   <div class="activities-page">
-    <!-- <Greeting /> -->
-    
     <div class="container">
-      <h1 class="section-title">NOS ACTIVITÉS</h1>
+      <h1 class="section-title" data-aos="fade-up">NOS ACTIVITÉS</h1>
       
-      <div class="services-grid">
-        <div v-for="service in services" :key="service.name" class="service-card">
-          <div class="service-icon">{{ service.icon }}</div>
-          <h3 class="service-title">{{ service.name }}</h3>
-          <p class="service-desc">{{ service.description }}</p>
+      <!-- Services en lignes avec animations -->
+      <div class="services-list">
+        <div 
+          v-for="(service, index) in services" 
+          :key="service.name" 
+          class="service-row"
+          :class="{ 'reverse': index % 2 === 1 }"
+          data-aos="fade-up"
+          :data-aos-delay="index * 100"
+        >
+          <div class="service-image" data-aos="zoom-in" :data-aos-delay="index * 100 + 50">
+            <div class="image-wrapper">
+              <span class="service-icon-large">{{ service.icon }}</span>
+              <div class="image-overlay"></div>
+            </div>
+          </div>
+          <div class="service-content" data-aos="fade-left" :data-aos-delay="index * 100 + 100">
+            <div class="service-number">{{ (index + 1).toString().padStart(2, '0') }}</div>
+            <h3 class="service-title">{{ service.name }}</h3>
+            <p class="service-desc">{{ service.description }}</p>
+            <div class="service-features">
+              <span v-for="feature in service.features" :key="feature" class="feature-tag">
+                {{ feature }}
+              </span>
+            </div>
+            <button class="service-btn" @click="showServiceDetails(service)">
+              En savoir plus
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="clients-section">
+      <!-- Section clients avec animation -->
+      <div class="clients-section" data-aos="fade-up" data-aos-delay="600">
         <h2>Ils nous ont fait confiance</h2>
-        <div class="clients-grid">
-          <span v-for="client in clients" :key="client" class="client-tag">
-            {{ client }}
-          </span>
+        <div class="clients-marquee">
+          <div class="clients-track" ref="clientsTrack">
+            <span v-for="client in duplicatedClients" :key="client" class="client-tag">
+              {{ client }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
+    
+    <Thanks />
+    
+    <!-- Modal détails service -->
+    <transition name="modal">
+      <div v-if="selectedService" class="modal-overlay" @click.self="closeModal">
+        <div class="modal-content" data-aos="zoom-in">
+          <button class="modal-close" @click="closeModal">×</button>
+          <div class="modal-icon">{{ selectedService.icon }}</div>
+          <h3>{{ selectedService.name }}</h3>
+          <p>{{ selectedService.description }}</p>
+          <div class="modal-features">
+            <h4>Prestations incluses :</h4>
+            <ul>
+              <li v-for="feature in selectedService.features" :key="feature">
+                {{ feature }}
+              </li>
+            </ul>
+          </div>
+          <button class="btn-contact" @click="contactService">Demander un devis</button>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
-import Greeting from '../components/Greeting.vue'
+import Thanks from '../components/Thanks.vue'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+
 export default {
   name: 'ActivitiesView',
   components: {
-    Greeting
+    Thanks
   },
   data() {
     return {
+      selectedService: null,
+      marqueeInterval: null,
+      scrollPosition: 0,
+      
       services: [
-        { icon: '🎨', name: 'Conception', description: 'Logo, identité visuelle, design graphique' },
-        { icon: '🖨️', name: 'Impression', description: 'Affiche, brochure, autocollant, bâche' },
-        { icon: '🎪', name: 'Événementiel', description: 'Salon, PLV, covering, organisation' },
-        { icon: '📦', name: 'Goodies', description: 'Stylo, gourde, porte-clé, totebag' },
-        { icon: '👕', name: 'Textile', description: 'Totebag, gilet, personnalisation' },
-        { icon: '🏷️', name: 'PLV', description: 'Enseigne, comptoir, îlot, réglette' }
+        { 
+          icon: '🎨', 
+          name: 'Conception', 
+          description: 'Création d\'identité visuelle unique et percutante pour votre marque',
+          features: ['Logo', 'Identité visuelle', 'Design graphique', 'Charte graphique', 'Packaging']
+        },
+        { 
+          icon: '🖨️', 
+          name: 'Impression', 
+          description: 'Impression haut de gamme sur tous supports avec un rendu exceptionnel',
+          features: ['Affiche', 'Brochure', 'Autocollant', 'Bâche', 'Flyer', 'Carte de visite']
+        },
+        { 
+          icon: '🎪', 
+          name: 'Événementiel', 
+          description: 'Organisation complète d\'événements professionnels et privatifs',
+          features: ['Salon', 'PLV', 'Covering', 'Stand personnalisé', 'Signalétique']
+        },
+        { 
+          icon: '📦', 
+          name: 'Goodies', 
+          description: 'Articles personnalisés pour renforcer votre image de marque',
+          features: ['Stylo', 'Gourde', 'Porte-clé', 'Tote bag', 'Mug', 'Power bank']
+        },
+        { 
+          icon: '👕', 
+          name: 'Textile', 
+          description: 'Personnalisation textile pour uniformes et vêtements promotionnels',
+          features: ['Tote bag', 'Gilet', 'T-shirt', 'Polo', 'Veste', 'Casquette']
+        },
+        { 
+          icon: '🏷️', 
+          name: 'PLV', 
+          description: 'Solutions de publicité sur lieu de vente sur mesure',
+          features: ['Enseigne', 'Comptoir', 'Îlot', 'Réglette', 'Présentoir', 'Totem']
+        }
       ],
+      
       clients: [
         'NATICS', 'SANIFER', 'TALYS', 'INVISIO', 'BNI', 'ALTHEA', 'KVM',
         'Vahatra', 'METROPOLE', 'AXIAN', 'Kaid', 'Woogle', 'Ecusson',
         'Mohamed', 'Nanah', 'Christopher', 'Ando', 'Aina', 'Aristide',
-        'Kiran Metha', 'Vahatra', 'Anja', 'Saraha'
+        'Kiran Metha', 'Anja', 'Saraha', 'UNICEF', 'PNUD', 'ORANGE',
+        'AIRTEL', 'BMOI', 'ACCESS BANK', 'ZOMA MARKET', 'HABIBO'
       ]
+    }
+  },
+  computed: {
+    duplicatedClients() {
+      return [...this.clients, ...this.clients, ...this.clients];
+    }
+  },
+  mounted() {
+    this.startClientsMarquee();
+    // Initialisation AOS (animation au scroll)
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100,
+      easing: 'ease-out-cubic'
+    });
+  },
+  beforeDestroy() {
+    this.stopClientsMarquee();
+  },
+  methods: {
+    showServiceDetails(service) {
+      this.selectedService = service;
+      document.body.style.overflow = 'hidden';
+    },
+    
+    closeModal() {
+      this.selectedService = null;
+      document.body.style.overflow = '';
+    },
+    
+    contactService() {
+      this.closeModal();
+      // Rediriger vers la page de contact ou ouvrir le modal de devis
+      this.$router.push('/contact');
+    },
+    
+    startClientsMarquee() {
+      this.stopClientsMarquee();
+      this.marqueeInterval = setInterval(() => {
+        if (this.$refs.clientsTrack) {
+          this.$refs.clientsTrack.scrollLeft += 1;
+          if (this.$refs.clientsTrack.scrollLeft >= this.$refs.clientsTrack.scrollWidth / 3) {
+            this.$refs.clientsTrack.scrollLeft = 0;
+          }
+        }
+      }, 30);
+    },
+    
+    stopClientsMarquee() {
+      if (this.marqueeInterval) {
+        clearInterval(this.marqueeInterval);
+        this.marqueeInterval = null;
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.activities-page {
-  padding: 0 0 60px;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  width: 100%;
-}
-
-.section-title {
-  font-size: 48px;
-  font-weight: 800;
-  margin: 100px 0 50px;
-  color: var(--gray);
-  position: relative;
-  display: block;
-  width: 100%;
-  padding-left: 30px;
-  word-break: break-word;
-  white-space: normal;
-  overflow: visible;
-  clear: both;
-}
-
-.section-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 10px;
-  height: 10px;
-  background: var(--yellow);
-  border-radius: 50%;
-  transform: translateY(-50%);
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-  margin-bottom: 60px;
-}
-
-.service-card {
-  background: var(--white);
-  padding: 30px 20px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: transform 0.3s ease;
-  border: 1px solid #eee;
-}
-
-.service-card:hover {
-  transform: translateY(-10px);
-  border-color: var(--yellow);
-}
-
-.service-icon {
-  width: 70px;
-  height: 70px;
-  background: var(--yellow);
-  border-radius: 50%;
-  margin: 0 auto 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: var(--gray);
-}
-
-.service-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: var(--gray);
-}
-
-.service-desc {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-}
-
-.clients-section {
-  margin-top: 60px;
-}
-
-.clients-section h2 {
-  font-size: 32px;
-  margin-bottom: 30px;
-  color: var(--gray);
-}
-
-.clients-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.client-tag {
-  background: var(--yellow);
-  color: var(--gray);
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 14px;
-  transition: transform 0.3s ease;
-}
-
-.client-tag:hover {
-  transform: scale(1.05);
-}
-
-@media (min-width: 1200px) {
-  .section-title {
-    margin: 100px 0 50px;
-  }
-}
-
-@media (max-width: 1199px) and (min-width: 993px) {
-  .section-title {
-    font-size: 44px;
-    margin: 110px 0 45px;
-    padding-left: 30px;
-  }
-}
-
-@media (max-width: 992px) and (min-width: 769px) {
-  .activities-page {
-    padding-top: 20px;
-  }
-
-  .section-title {
-    font-size: 42px;
-    margin: 130px 0 40px; 
-    padding-left: 30px;
-    display: block;
-    width: 100%;
-    color: var(--gray);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .section-title::before {
-    width: 10px;
-    height: 10px;
-    background: var(--yellow);
-  }
-
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .clients-section h2 {
-    font-size: 30px;
-  }
-}
-
-@media (max-width: 768px) {
-  .activities-page {
-    padding-top: 30px;
-  }
-
-  .section-title {
-    font-size: 36px;
-    margin: 140px 0 30px;
-    padding-left: 25px;
-    text-align: left;
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    color: var(--gray);
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .section-title::before {
-    width: 10px;
-    height: 10px;
-    background: var(--yellow);
-  }
-  
-  .services-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .clients-section h2 {
-    font-size: 28px;
-    text-align: center;
-  }
-  
-  .clients-grid {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .activities-page {
-    padding-top: 40px;
-  }
-
-  .section-title {
-    font-size: 32px;
-    margin: 150px 0 25px;
-    padding-left: 20px;
-  }
-}
-
-@media (max-width: 380px) {
-  .section-title {
-    font-size: 28px;
-    margin: 160px 0 20px;
-  }
-}
+@import '/src/styles/activities.css';
 </style>

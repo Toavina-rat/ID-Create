@@ -14,14 +14,22 @@
     
     <!-- Contenu principal avec effet de flou quand le menu est ouvert -->
     <div class="main-content" :class="{ 'menu-open': isMenuOpen }">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </div>
     
     <AppFooter />
+    
     <ScrollToTop />
     
     <!-- Menu latéral avec logos -->
     <LogoMenu @toggle="handleMenuToggle" />
+    
+    <!-- Page Transition -->
+    <PageTransition ref="pageTransition" />
   </div>
 </template>
 
@@ -30,7 +38,8 @@ import AppHeader from './components/Header.vue'
 import AppFooter from './components/Footer.vue'
 import ScrollToTop from './components/ScrollToTop.vue'
 import GreetingOpening from './components/GreetingOpening.vue'
-import LogoMenu from './components/LogoMenu.vue' // Import du nouveau menu
+import LogoMenu from './components/LogoMenu.vue'
+import PageTransition from './components/PageTransition.vue'
 
 export default {
   name: 'App',
@@ -39,18 +48,21 @@ export default {
     AppFooter,
     ScrollToTop,
     GreetingOpening,
-    LogoMenu // Ajout du composant
+    LogoMenu,
+    PageTransition
   },
   data() {
     return {
       cursorX: 0,
       cursorY: 0,
-      showGreeting: true, // Afficher la bannière d'ouverture
-      isMenuOpen: false // Nouvel état pour le menu
+      showGreeting: true,
+      isMenuOpen: false
     }
   },
   mounted() {
     document.addEventListener('mousemove', this.onMouseMove)
+    // Intercepter les changements de route
+    this.setupRouterInterceptor()
   },
   beforeUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove)
@@ -67,6 +79,48 @@ export default {
       } else {
         document.body.style.overflow = '';
       }
+    },
+    setupRouterInterceptor() {
+      const router = this.$router
+      let transitionInProgress = false
+      
+      router.beforeEach(async (to, from, next) => {
+        // Éviter les transitions multiples
+        if (transitionInProgress) {
+          next(false)
+          return
+        }
+        
+        // Ne pas afficher la transition pour la première page
+        if (from.name === null) {
+          next()
+          return
+        }
+        
+        // Ne pas afficher la transition si on va vers la page Thanks
+        if (to.name === 'thanks') {
+          next()
+          return
+        }
+        
+        transitionInProgress = true
+        
+        // Démarrer la transition
+        if (this.$refs.pageTransition) {
+          await this.$refs.pageTransition.startTransition()
+        }
+        
+        next()
+      })
+      
+      router.afterEach(() => {
+        setTimeout(() => {
+          if (this.$refs.pageTransition) {
+            this.$refs.pageTransition.endTransition()
+          }
+          transitionInProgress = false
+        }, 200)
+      })
     }
   }
 }
@@ -135,5 +189,16 @@ body {
   filter: blur(3px);
   transition: filter 0.3s ease;
   pointer-events: none;
+}
+
+/* Transition fade entre les pages */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

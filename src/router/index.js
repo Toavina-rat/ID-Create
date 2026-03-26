@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import WorkView from '../views/WorkView.vue'
 import ActivitiesView from '../views/ActivitiesView.vue'
 import ContactView from '../views/ContactView.vue'
-import ThanksView from '../views/ThanksView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,11 +26,6 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: ContactView
-    },
-    {
-      path: '/all-work',
-      name: 'thanks',
-      component: ThanksView
     }
   ]
 })

@@ -7,71 +7,131 @@
       :class="{ 'menu-open': isOpen }"
       @click="toggleMenu"
     >
-      <!-- Le texte n'apparaît que sur desktop -->
       <span class="menu-text desktop-only">{{ isOpen ? 'CLOSE' : 'MENU' }}</span>
       <span class="menu-icon">{{ isOpen ? '×' : '☰' }}</span>
     </button>
 
-    <!-- Menu latéral avec animation livre -->
-    <transition name="book-animation">
-      <div v-if="isOpen" class="logo-sidebar">
-        <!-- Header du sidebar avec titre -->
-        <div class="sidebar-header">
-          <h2 class="sidebar-title">NOS PARTENAIRES</h2>
-          <p class="sidebar-subtitle">Ils nous font confiance</p>
-        </div>
-
-        <!-- Navigation Links -->
-        <div class="sidebar-nav">
-          <h3 class="nav-title">Navigation</h3>
-          <div class="nav-links">
-            <router-link to="/activities" class="nav-link" @click="closeMenu">
-              <span class="nav-icon">📋</span>
-              <span class="nav-text">Activities</span>
-            </router-link>
-            
-            <router-link to="/contact" class="nav-link" @click="closeMenu">
-              <span class="nav-icon">📬</span>
-              <span class="nav-text">Contact</span>
-            </router-link>
-            
-            <a href="#" class="nav-link" @click.prevent="openDevisModal">
-              <span class="nav-icon">⚡</span>
-              <span class="nav-text">Work with us</span>
-              <span class="nav-badge">Demande de devis</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Zone de défilement des logos -->
-        <div class="logos-marquee-container" ref="marqueeContainer">
-          <div class="logos-marquee" :style="marqueeStyle">
-            <div 
-              v-for="(logo, index) in duplicatedLogos" 
-              :key="index"
-              class="marquee-item"
-            >
-              <div class="logo-placeholder">
-                <span class="logo-icon">{{ getLogoIcon(logo) }}</span>
+    <!-- Page complète qui s'affiche quand on clique sur MENU -->
+    <transition name="page-slide">
+      <div v-if="isOpen" class="fullscreen-menu-page">
+        <!-- Arrière-plan avec 3 lignes de logos qui défilent -->
+        <div class="background-marquee">
+          <div class="marquee-container">
+            <!-- LIGNE 1 - défile vers la gauche -->
+            <div class="marquee-track" :style="marqueeStyle1">
+              <div 
+                v-for="(logo, index) in duplicatedLogos" 
+                :key="'line1-' + index"
+                class="marquee-logo"
+              >
+                <div class="logo-bg-wrapper">
+                  <img :src="getLogoImage(logo)" :alt="logo" class="logo-bg-img">
+                  <span class="logo-bg-name">{{ logo }}</span>
+                </div>
               </div>
-              <span class="logo-name">{{ logo }}</span>
+            </div>
+            
+            <!-- LIGNE 2 - défile vers la droite -->
+            <div class="marquee-track reverse" :style="marqueeStyle2">
+              <div 
+                v-for="(logo, index) in duplicatedLogos" 
+                :key="'line2-' + index"
+                class="marquee-logo"
+              >
+                <div class="logo-bg-wrapper">
+                  <img :src="getLogoImage(logo)" :alt="logo" class="logo-bg-img">
+                  <span class="logo-bg-name">{{ logo }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- LIGNE 3 - défile vers la gauche -->
+            <div class="marquee-track" :style="marqueeStyle3">
+              <div 
+                v-for="(logo, index) in duplicatedLogos" 
+                :key="'line3-' + index"
+                class="marquee-logo"
+              >
+                <div class="logo-bg-wrapper">
+                  <img :src="getLogoImage(logo)" :alt="logo" class="logo-bg-img">
+                  <span class="logo-bg-name">{{ logo }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Stats rapides -->
-        <div class="sidebar-footer">
-          <div class="stat-item">
-            <span class="stat-value">{{ partnerCount }}</span>
-            <span class="stat-label">Partenaires</span>
+        <!-- Contenu de la page (par-dessus l'arrière-plan) -->
+        <div class="page-content">
+          <!-- Header -->
+          <div class="content-header">
+            <h1 class="main-title">NOS PARTENAIRES</h1>
+            <p class="main-subtitle">Ils nous font confiance</p>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ uniqueSectors }}</span>
-            <span class="stat-label">Secteurs</span>
+
+          <!-- Navigation Links -->
+          <div class="navigation-section">
+            <h3 class="section-title">Navigation</h3>
+            <div class="nav-links">
+              <router-link to="/activities" class="nav-link" @click="closeMenu">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Activities</span>
+              </router-link>
+              
+              <router-link to="/contact" class="nav-link" @click="closeMenu">
+                <span class="nav-icon">📬</span>
+                <span class="nav-text">Contact</span>
+              </router-link>
+              
+              <a href="#" class="nav-link" @click.prevent="openDevisModal">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-text">Work with us</span>
+                <span class="nav-badge">Devis</span>
+              </a>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ internationalCount }}</span>
-            <span class="stat-label">International</span>
+
+          <!-- Section des logos partenaires (défilement horizontal) -->
+          <div class="partners-section">
+            <h3 class="section-title">Nos partenaires</h3>
+            <div class="logos-horizontal-scroll" ref="scrollContainer">
+              <div class="logos-scroll-track" ref="scrollTrack">
+                <div 
+                  v-for="(logo, idx) in carouselLogos" 
+                  :key="idx"
+                  class="partner-logo-item"
+                  @click="openPartnerLink(logo)"
+                >
+                  <div class="partner-logo-circle">
+                    <img :src="getLogoImage(logo)" :alt="logo" class="partner-img">
+                  </div>
+                  <span class="partner-name">{{ logo }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats rapides -->
+          <div class="stats-section">
+            <div class="stat-card">
+              <span class="stat-number">{{ partnerCount }}</span>
+              <span class="stat-label">Partenaires</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">{{ uniqueSectors }}</span>
+              <span class="stat-label">Secteurs</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">{{ internationalCount }}</span>
+              <span class="stat-label">International</span>
+            </div>
+          </div>
+
+          <!-- Footer avec lien de fermeture -->
+          <div class="page-footer">
+            <button class="close-page-btn" @click="closeMenu">
+              ✕ Fermer
+            </button>
           </div>
         </div>
       </div>
@@ -113,17 +173,12 @@
             </div>
             <div class="modal-actions">
               <button type="button" class="btn btn-outline" @click="closeDevisModal">Annuler</button>
-              <button type="submit" class="btn">Envoyer la demande</button>
+              <button type="submit" class="btn">Envoyer</button>
             </div>
           </form>
           <button class="modal-close" @click="closeDevisModal">×</button>
         </div>
       </div>
-    </transition>
-
-    <!-- Overlay sombre quand le menu est ouvert -->
-    <transition name="fade">
-      <div v-if="isOpen" class="menu-overlay" @click="closeMenu"></div>
     </transition>
 
     <!-- Notification toast -->
@@ -152,7 +207,10 @@ export default {
       toastMessage: '',
       toastType: 'success',
       animationFrame: null,
-      scrollPosition: 0,
+      carouselInterval: null,
+      scrollPosition1: 0,
+      scrollPosition2: 0,
+      scrollPosition3: 0,
       
       devisForm: {
         name: '',
@@ -162,6 +220,9 @@ export default {
         message: ''
       },
       
+      // ============================================================
+      // 🔧 MODIFIEZ ICI LA LISTE DES LOGOS (AJOUTEZ / SUPPRIMEZ)
+      // ============================================================
       rawLogos: `UNICEF, PNUD, UNOPS, FAO, TANDAVANALA, SAHANALA, ADDEV, HELVETAS,
 FISA, UK EMBASSY, TURKEY EMBASSY, BMOI, BNI, ACCESS BANK, SKILLZ,
 PAMF, AQUAMAD, IZILI, CCIFM, ALFA CIMENT, KIBO, SANIFER, ZOMA MARKET,
@@ -172,83 +233,91 @@ MADAGASCAR, JB, OIM, SOCOLAIT, NATICS, KVM, CERNOL, CTL, AXIAN
 UNIVERSITY, SGEM, UNITED MALAGASY, ALTHEA, HYGEA, PANAGORA, RAPIDE
 SERVICES, BLUELINE, 2424.MG`,
       
-      // Icônes par catégorie
-      iconMap: {
-        // Institutions / ONG
-        'UNICEF': '🌍',
-        'PNUD': '🤝',
-        'UNOPS': '🏗️',
-        'FAO': '🌾',
-        'OIM': '🚶',
-        'HELVETAS': '🏔️',
-        'FISA': '⚖️',
-        'UK EMBASSY': '👑',
-        'TURKEY EMBASSY': '🕌',
-        
-        // Banques / Finance
-        'BMOI': '🏦',
-        'BNI': '💰',
-        'ACCESS BANK': '💳',
-        'SKILLZ': '🎯',
-        
-        // Entreprises locales
-        'TANDAVANALA': '🌿',
-        'SAHANALA': '🌱',
-        'ADDEV': '⚙️',
-        'PAMF': '🛡️',
-        'AQUAMAD': '💧',
-        'IZILI': '🧴',
-        'CCIFM': '🤝',
-        'ALFA CIMENT': '🏭',
-        'KIBO': '🛒',
-        'SANIFER': '🧹',
-        'ZOMA MARKET': '🏪',
-        'HABIBO': '🍫',
-        'WAKA': '🚀',
-        'ZEBULON': '🦓',
-        'MABEL': '👗',
-        'AGRIKOBA': '🌽',
-        'AGRIFARM': '🚜',
-        'PIQLA': '📱',
-        'ID RENTAL': '🚗',
-        
-        // Télécoms / Tech
-        'AXIAN': '📡',
-        'ORANGE': '📱',
-        'ORANGE BUSINESS SERVICES': '💼',
-        'SEM': '🔧',
-        'TOM': '🎵',
-        'TOA': '🎨',
-        'GES': '🔌',
-        'MADAGASCO': '📊',
-        'STELLAR IX': '✨',
-        'CONNECTEO': '🔗',
-        'YAS': '⚡',
-        'AIRTEL': '📶',
-        
-        // Agro-alimentaire
-        'HONEY OF MADAGASCAR': '🍯',
-        'SOCOLAIT': '🍫',
-        'NATICS': '🥤',
-        
-        // Éducation / Services
-        'KVM': '💻',
-        'CERNOL': '⚛️',
-        'CTL': '🔬',
-        'AXIAN UNIVERSITY': '🎓',
-        'SGEM': '📈',
-        'UNITED MADAGASY': '🤝',
-        'ALTHEA': '🌺',
-        'HYGEA': '🧼',
-        'PANAGORA': '🏛️',
-        'RAPIDE SERVICES': '⚡',
-        'BLUELINE': '🔵',
-        '2424.MG': '📱',
-        'JB': '👔'
+      // ============================================================
+      // 🔧 MODIFIEZ ICI LES URL DES IMAGES DES LOGOS
+      // METTEZ LE CHEMIN VERS VOS IMAGES (ex: /images/unicef.png)
+      // ============================================================
+      logoImages: {
+        'UNICEF': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/UNICEF_Logo.svg/200px-UNICEF_Logo.svg.png',
+        'PNUD': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/UNDP_Logo.svg/200px-UNDP_Logo.svg.png',
+        'UNOPS': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/UNOPS_logo.svg/200px-UNOPS_logo.svg.png',
+        'FAO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/FAO_logo.svg/200px-FAO_logo.svg.png',
+        'OIM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/IOM_logo.svg/200px-IOM_logo.svg.png',
+        'HELVETAS': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Helvetas_logo.svg/200px-Helvetas_logo.svg.png',
+        'FISA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=FISA',
+        'UK EMBASSY': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom.svg/200px-Flag_of_the_United_Kingdom.svg.png',
+        'TURKEY EMBASSY': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/200px-Flag_of_Turkey.svg.png',
+        'BMOI': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=BMOI',
+        'BNI': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=BNI',
+        'ACCESS BANK': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ACCESS',
+        'SKILLZ': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SKILLZ',
+        'TANDAVANALA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=TANDAVANALA',
+        'SAHANALA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SAHANALA',
+        'ADDEV': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ADDEV',
+        'PAMF': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=PAMF',
+        'AQUAMAD': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=AQUAMAD',
+        'IZILI': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=IZILI',
+        'CCIFM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=CCIFM',
+        'ALFA CIMENT': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ALFA',
+        'KIBO': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=KIBO',
+        'SANIFER': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SANIFER',
+        'ZOMA MARKET': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ZOMA',
+        'HABIBO': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=HABIBO',
+        'WAKA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=WAKA',
+        'ZEBULON': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ZEBULON',
+        'MABEL': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=MABEL',
+        'AGRIKOBA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=AGRIKOBA',
+        'AGRIFARM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=AGRIFARM',
+        'PIQLA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=PIQLA',
+        'ID RENTAL': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ID',
+        'AXIAN': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=AXIAN',
+        'ORANGE': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Orange_logo.svg/200px-Orange_logo.svg.png',
+        'ORANGE BUSINESS SERVICES': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Orange_logo.svg/200px-Orange_logo.svg.png',
+        'SEM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SEM',
+        'TOM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=TOM',
+        'TOA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=TOA',
+        'GES': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=GES',
+        'MADAGASCO': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=MADAGASCO',
+        'STELLAR IX': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=STELLAR',
+        'CONNECTEO': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=CONNECTEO',
+        'YAS': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=YAS',
+        'AIRTEL': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Airtel_Logo.svg/200px-Airtel_Logo.svg.png',
+        'HONEY OF MADAGASCAR': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=HONEY',
+        'JB': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=JB',
+        'SOCOLAIT': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SOCOLAIT',
+        'NATICS': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=NATICS',
+        'KVM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=KVM',
+        'CERNOL': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=CERNOL',
+        'CTL': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=CTL',
+        'AXIAN UNIVERSITY': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=AXIAN+U',
+        'SGEM': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=SGEM',
+        'UNITED MALAGASY': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=UNITED',
+        'ALTHEA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=ALTHEA',
+        'HYGEA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=HYGEA',
+        'PANAGORA': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=PANAGORA',
+        'RAPIDE SERVICES': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=RAPIDE',
+        'BLUELINE': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=BLUELINE',
+        '2424.MG': 'https://via.placeholder.com/80x80/f7b815/ffffff?text=2424'
+      },
+      
+      // ============================================================
+      // 🔧 MODIFIEZ ICI LES LIENS DES PARTENAIRES (CLIC SUR LOGO)
+      // ============================================================
+      partnerLinks: {
+        'UNICEF': 'https://www.unicef.org',
+        'PNUD': 'https://www.undp.org',
+        'AXIAN': 'https://www.axian-group.com',
+        'ORANGE': 'https://www.orange.com',
+        'AIRTEL': 'https://www.airtel.com',
+        'BMOI': 'https://www.bmoi.mg',
+        'BNI': 'https://www.bni.mg',
+        'FAO': 'https://www.fao.org',
+        'HELVETAS': 'https://www.helvetas.org'
       }
     }
   },
   computed: {
+    // Liste des logos
     logoList() {
       return this.rawLogos
         .split(',')
@@ -257,23 +326,32 @@ SERVICES, BLUELINE, 2424.MG`,
         .filter(item => item.length > 0);
     },
     
+    // Pour le carrousel (logos en avant)
+    carouselLogos() {
+      return [...this.logoList, ...this.logoList, ...this.logoList];
+    },
+    
+    // Pour l'arrière-plan (3 lignes)
+    duplicatedLogos() {
+      return [...this.logoList, ...this.logoList, ...this.logoList];
+    },
+    
     partnerCount() {
       return this.logoList.length;
     },
     
-    // Dupliquer les logos pour un défilement infini
-    duplicatedLogos() {
-      return [...this.logoList, ...this.logosList, ...this.logoList, ...this.logoList];
+    marqueeStyle1() {
+      return { transform: `translateX(-${this.scrollPosition1}px)` };
     },
     
-    // Style pour l'animation de défilement
-    marqueeStyle() {
-      return {
-        transform: `translateX(-${this.scrollPosition}px)`
-      };
+    marqueeStyle2() {
+      return { transform: `translateX(${this.scrollPosition2}px)` };
     },
     
-    // Stats calculées
+    marqueeStyle3() {
+      return { transform: `translateX(-${this.scrollPosition3}px)` };
+    },
+    
     uniqueSectors() {
       const sectors = new Set();
       this.logoList.forEach(logo => {
@@ -287,6 +365,7 @@ SERVICES, BLUELINE, 2424.MG`,
           sectors.add('Industrie');
         else if (logo.includes('HONEY') || logo.includes('SOCOLAIT') || logo.includes('NATICS')) 
           sectors.add('Agro-alimentaire');
+        else sectors.add('Entreprise');
       });
       return sectors.size;
     },
@@ -301,23 +380,26 @@ SERVICES, BLUELINE, 2424.MG`,
   watch: {
     isOpen(newVal) {
       if (newVal) {
-        this.startMarquee();
+        this.startBackgroundMarquee();
+        this.startCarousel();
         document.body.style.overflow = 'hidden';
       } else {
-        this.stopMarquee();
+        this.stopBackgroundMarquee();
+        this.stopCarousel();
         document.body.style.overflow = '';
       }
-      
       this.$emit('toggle', newVal);
     }
   },
   mounted() {
     if (this.isOpen) {
-      this.startMarquee();
+      this.startBackgroundMarquee();
+      this.startCarousel();
     }
   },
   beforeDestroy() {
-    this.stopMarquee();
+    this.stopBackgroundMarquee();
+    this.stopCarousel();
     document.body.style.overflow = '';
   },
   methods: {
@@ -331,16 +413,13 @@ SERVICES, BLUELINE, 2424.MG`,
     
     openDevisModal() {
       this.showDevisModal = true;
-      document.body.style.overflow = 'hidden';
     },
     
     closeDevisModal() {
       this.showDevisModal = false;
-      document.body.style.overflow = '';
     },
     
     submitDevis() {
-      console.log('Formulaire soumis:', this.devisForm);
       this.showNotification('Demande envoyée avec succès!', 'success');
       this.devisForm = {
         name: '',
@@ -350,602 +429,79 @@ SERVICES, BLUELINE, 2424.MG`,
         message: ''
       };
       this.closeDevisModal();
-      this.closeMenu();
+    },
+    
+    openPartnerLink(logo) {
+      const link = this.partnerLinks[logo];
+      if (link) {
+        window.open(link, '_blank');
+        this.showNotification(logo, 'success');
+      } else {
+        this.showNotification(`Aucun lien pour ${logo}`, 'error');
+      }
+    },
+    
+    getLogoImage(logo) {
+      return this.logoImages[logo] || 'https://via.placeholder.com/80x80/cccccc/ffffff?text=Logo';
     },
     
     showNotification(message, type = 'success') {
       this.toastMessage = message;
       this.toastType = type;
       this.showToast = true;
-      
       setTimeout(() => {
         this.showToast = false;
-      }, 3000);
+      }, 2000);
     },
     
-    startMarquee() {
-      this.stopMarquee();
-      
+    // Animation des 3 lignes en arrière-plan
+    startBackgroundMarquee() {
+      this.stopBackgroundMarquee();
       const animate = () => {
-        this.scrollPosition += 0.8;
+        this.scrollPosition1 += 0.7;
+        this.scrollPosition2 += 0.5;
+        this.scrollPosition3 += 0.9;
         
-        // Réinitialiser quand on a défilé un jeu complet
-        const itemWidth = 220;
-        const singleSetWidth = itemWidth * this.logoList.length;
-        if (this.scrollPosition >= singleSetWidth * 2) {
-          this.scrollPosition = 0;
-        }
+        const totalWidth = this.logoList.length * 280;
+        if (this.scrollPosition1 >= totalWidth) this.scrollPosition1 = 0;
+        if (this.scrollPosition2 >= totalWidth) this.scrollPosition2 = 0;
+        if (this.scrollPosition3 >= totalWidth) this.scrollPosition3 = 0;
         
         this.animationFrame = requestAnimationFrame(animate);
       };
-      
       this.animationFrame = requestAnimationFrame(animate);
     },
     
-    stopMarquee() {
+    stopBackgroundMarquee() {
       if (this.animationFrame) {
         cancelAnimationFrame(this.animationFrame);
         this.animationFrame = null;
       }
     },
     
-    getLogoIcon(logo) {
-      return this.iconMap[logo] || '📌';
+    // Animation du carrousel (logos en avant)
+    startCarousel() {
+      this.stopCarousel();
+      this.carouselInterval = setInterval(() => {
+        if (this.$refs.scrollTrack) {
+          this.$refs.scrollTrack.scrollLeft += 1.2;
+          if (this.$refs.scrollTrack.scrollLeft >= this.$refs.scrollTrack.scrollWidth / 3) {
+            this.$refs.scrollTrack.scrollLeft = 0;
+          }
+        }
+      }, 30);
+    },
+    
+    stopCarousel() {
+      if (this.carouselInterval) {
+        clearInterval(this.carouselInterval);
+        this.carouselInterval = null;
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.menu-toggle {
-  position: fixed;
-  top: 30px;
-  right: 30px;
-  z-index: 1001;
-  background: #f7b815;
-  color: #3b3b3b;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(247, 184, 21, 0.3);
-  transition: all 0.3s ease;
-}
-
-.menu-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(247, 184, 21, 0.4);
-}
-
-.menu-toggle.menu-open {
-  background: #3b3b3b;
-  color: #fefefe;
-}
-
-.menu-icon {
-  font-size: 24px;
-  line-height: 1;
-}
-
-.menu-text {
-  letter-spacing: 1px;
-}
-
-/* Cache le texte sur mobile */
-@media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
-  
-  .menu-toggle {
-    padding: 12px 16px; /* Réduit le padding horizontal sur mobile */
-  }
-}
-
-/* Animation livre */
-.book-animation-enter-active,
-.book-animation-leave-active {
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.book-animation-enter-from {
-  transform: translateX(100%) rotateY(-90deg);
-}
-
-.book-animation-enter-to {
-  transform: translateX(0) rotateY(0);
-}
-
-.book-animation-leave-from {
-  transform: translateX(0) rotateY(0);
-}
-
-.book-animation-leave-to {
-  transform: translateX(100%) rotateY(90deg);
-}
-
-.logo-sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 600px;
-  height: 100vh;
-  background: linear-gradient(135deg, #fefefe 0%, #f8f8f8 100%);
-  z-index: 1000;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  border-left: 3px solid #f7b815;
-  transform-origin: right center;
-  backface-visibility: hidden;
-}
-
-.sidebar-header {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.sidebar-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #3b3b3b;
-  margin-bottom: 5px;
-  line-height: 1.2;
-  position: relative;
-  display: inline-block;
-}
-
-.sidebar-title::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: #f7b815;
-  border-radius: 3px;
-}
-
-.sidebar-subtitle {
-  color: #f7b815;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 1px;
-  margin-top: 10px;
-}
-
-/* Navigation */
-.sidebar-nav {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px dashed rgba(247, 184, 21, 0.2);
-}
-
-.nav-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #f7b815;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  background: rgba(247, 184, 21, 0.05);
-  border-radius: 12px;
-  text-decoration: none;
-  color: #3b3b3b;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(247, 184, 21, 0.1);
-}
-
-.nav-link:hover {
-  background: #f7b815;
-  transform: translateX(5px);
-  border-color: #f7b815;
-}
-
-.nav-link:hover .nav-text,
-.nav-link:hover .nav-icon {
-  color: #3b3b3b;
-}
-
-.nav-icon {
-  font-size: 20px;
-  color: #f7b815;
-  transition: color 0.3s ease;
-}
-
-.nav-text {
-  font-weight: 600;
-  font-size: 15px;
-  transition: color 0.3s ease;
-}
-
-.nav-badge {
-  margin-left: auto;
-  font-size: 10px;
-  background: #3b3b3b;
-  color: #f7b815;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.nav-link:hover .nav-badge {
-  background: #fefefe;
-  color: #3b3b3b;
-}
-
-.logos-marquee-container {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  background: rgba(247, 184, 21, 0.03);
-  border-radius: 20px;
-  padding: 20px 0;
-  margin: 10px 0;
-  border: 1px solid rgba(247, 184, 21, 0.1);
-}
-
-.logos-marquee {
-  display: flex;
-  gap: 15px;
-  white-space: nowrap;
-  will-change: transform;
-  padding: 0 10px;
-}
-
-.marquee-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 20px 8px 12px;
-  background: #fefefe;
-  border: 2px solid rgba(247, 184, 21, 0.2);
-  border-radius: 50px;
-  font-weight: 600;
-  color: #3b3b3b;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
-}
-
-.marquee-item:hover {
-  background: #f7b815;
-  border-color: #f7b815;
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 8px 20px rgba(247, 184, 21, 0.3);
-}
-
-.logo-placeholder {
-  width: 32px;
-  height: 32px;
-  background: rgba(247, 184, 21, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.3s ease;
-}
-
-.marquee-item:hover .logo-placeholder {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-.logo-icon {
-  line-height: 1;
-}
-
-.logo-name {
-  font-weight: 600;
-}
-
-.sidebar-footer {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 2px dashed rgba(247, 184, 21, 0.3);
-}
-
-.stat-item {
-  text-align: center;
-  padding: 8px;
-  background: rgba(247, 184, 21, 0.05);
-  border-radius: 12px;
-  transition: transform 0.3s ease;
-}
-
-.stat-item:hover {
-  transform: translateY(-3px);
-  background: rgba(247, 184, 21, 0.1);
-}
-
-.stat-value {
-  display: block;
-  font-size: 24px;
-  font-weight: 800;
-  color: #f7b815;
-  line-height: 1;
-  margin-bottom: 3px;
-}
-
-.stat-label {
-  font-size: 10px;
-  color: #3b3b3b;
-  opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-}
-
-.menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  z-index: 999;
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: #fefefe;
-  padding: 30px;
-  border-radius: 30px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  border: 3px solid #f7b815;
-  box-shadow: 0 30px 40px -20px #f7b815;
-}
-
-.modal-content h3 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #3b3b3b;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: #3b3b3b;
-  font-size: 13px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 10px 15px;
-  border: 2px solid #eaeaea;
-  border-radius: 25px;
-  font-family: 'Montserrat', sans-serif;
-  transition: border-color 0.2s;
-  font-size: 14px;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #f7b815;
-}
-
-.form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b3b3b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 15px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.modal-actions .btn {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
-}
-
-.btn {
-  background: #f7b815;
-  color: #3b3b3b;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(247, 184, 21, 0.4);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid #f7b815;
-  color: #3b3b3b;
-}
-
-.btn-outline:hover {
-  background: #f7b815;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #3b3b3b;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-
-.modal-close:hover {
-  background: rgba(247, 184, 21, 0.2);
-}
-
-/* Toast notification */
-.toast-notification {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: #f7b815;
-  color: #3b3b3b;
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-weight: 600;
-  box-shadow: 0 10px 20px rgba(247, 184, 21, 0.3);
-  z-index: 2001;
-  border: 2px solid #fefefe;
-}
-
-.toast-notification.success {
-  background: #f7b815;
-}
-
-.toast-notification.error {
-  background: #ff4444;
-  color: white;
-}
-
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.modal-enter,
-.modal-leave-to {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.3s;
-}
-
-.toast-enter,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .logo-sidebar {
-    width: 100%;
-    padding: 20px;
-  }
-  
-  .menu-toggle {
-    top: 20px;
-    right: 20px;
-    padding: 10px 16px; /* Ajusté pour mobile */
-    font-size: 14px;
-  }
-  
-  .sidebar-title {
-    font-size: 24px;
-  }
-  
-  .marquee-item {
-    padding: 6px 16px 6px 10px;
-    font-size: 12px;
-  }
-  
-  .logo-placeholder {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-  }
-  
-  .stat-value {
-    font-size: 20px;
-  }
-  
-  .nav-link {
-    padding: 10px 12px;
-  }
-  
-  .modal-content {
-    padding: 20px;
-  }
-  
-  .modal-content h3 {
-    font-size: 20px;
-  }
-}
+@import '/src/styles/logomenu.css'
 </style>

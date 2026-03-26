@@ -1,0 +1,229 @@
+.thanks-footer {
+  width: 100%;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3d1 100%);
+  padding: 60px 20px 80px;
+  overflow: hidden;
+  position: relative;
+  border-top: 4px solid #f7b815;
+}
+
+.thanks-wrapper {
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+  height: auto;
+  min-height: 500px;
+}
+
+/* Couches de fond THANKS récursives */
+.thanks-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+/* Récursivité : 2 couches avec effet de profondeur */
+.thanks-bg1 { 
+  font-size: clamp(180px, 25vw, 420px);
+  opacity: 0.15;
+  letter-spacing: clamp(-16px, -2vw, -32px);
+  color: #f7b815;
+  transform: translate(-50%, -50%) rotate(-1deg);
+}
+
+.thanks-bg2 { 
+  font-size: clamp(150px, 22vw, 360px);
+  opacity: 0.35;
+  letter-spacing: clamp(-14px, -1.8vw, -28px);
+  color: #f7b815;
+  transform: translate(-50%, -50%) rotate(1deg);
+}
+
+/* Grand "THANKS" qui remplit la largeur de l'écran */
+.thanks-main {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(80px, 20vw, 280px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #f7b815 0%, #e5a00d 50%, #d48a07 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  line-height: 1;
+  letter-spacing: clamp(-6px, -1vw, -12px);
+  text-align: center;
+  width: 100%;
+  user-select: none;
+  text-shadow: 8px 8px 20px rgba(247, 184, 21, 0.2);
+  animation: subtleGlow 2s ease-in-out infinite;
+  padding: 60px 0;
+}
+
+@keyframes subtleGlow {
+  0%, 100% {
+    text-shadow: 8px 8px 20px rgba(247, 184, 21, 0.2);
+  }
+  50% {
+    text-shadow: 12px 12px 30px rgba(247, 184, 21, 0.35);
+  }
+}
+
+/* Style des bulles - Version responsive avec positions relatives */
+.bubble {
+  position: absolute;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3d1 100%);
+  color: #f7b815;
+  font-size: clamp(9px, 1.8vw, 17.5px);
+  font-weight: 700;
+  padding: clamp(3px, 0.8vw, 9px) clamp(8px, 2vw, 19px);
+  border-radius: 9999px;
+  border: clamp(2px, 0.4vw, 3.5px) solid #f7b815;
+  box-shadow: 0 5px 15px rgba(247, 184, 21, 0.2);
+  white-space: nowrap;
+  z-index: 10;
+  transition: all 0.3s ease;
+  cursor: default;
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.bubble:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(247, 184, 21, 0.35);
+  border-color: #e5a00d;
+  background: white;
+}
+
+/* Positions des bulles - Responsive avec pourcentages et clamp */
+.b1  { top: clamp(2%, 3vh, 5%);  left: clamp(1%, 3vw, 2%); }
+.b2  { top: clamp(10%, 12vh, 15%); left: clamp(0%, 2vw, 1%); }
+.b3  { top: clamp(8%, 10vh, 12%); left: clamp(12%, 15vw, 18%); }
+.b4  { top: clamp(22%, 25vh, 28%); left: clamp(3%, 5vw, 6%); }
+.b5  { top: clamp(40%, 42vh, 45%); left: clamp(0%, 2vw, 2%); }
+.b6  { top: clamp(58%, 60vh, 65%); left: clamp(5%, 7vw, 8%); }
+.b7  { top: clamp(68%, 70vh, 75%); left: clamp(18%, 20vw, 22%); }
+.b8  { top: clamp(4%, 6vh, 8%); left: clamp(28%, 30vw, 32%); }
+.b9  { top: clamp(16%, 18vh, 20%); left: clamp(34%, 36vw, 38%); }
+.b10 { top: clamp(2%, 4vh, 5%); left: clamp(50%, 52vw, 55%); }
+.b11 { top: clamp(14%, 16vh, 18%); left: clamp(60%, 62vw, 65%); }
+.b12 { top: clamp(28%, 30vh, 32%); left: clamp(55%, 58vw, 60%); }
+.b13 { top: clamp(44%, 46vh, 48%); left: clamp(68%, 70vw, 72%); }
+.b14 { top: clamp(62%, 65vh, 68%); left: clamp(64%, 66vw, 68%); }
+.b15 { top: clamp(12%, 14vh, 15%); left: clamp(78%, 80vw, 82%); }
+.b16 { top: clamp(34%, 36vh, 38%); left: clamp(82%, 84vw, 86%); }
+.b17 { top: clamp(54%, 56vh, 58%); left: clamp(80%, 82vw, 84%); }
+.b18 { top: clamp(66%, 69vh, 72%); left: clamp(41%, 43vw, 45%); }
+.b19 { top: clamp(56%, 59vh, 62%); left: clamp(24%, 26vw, 28%); }
+.b20 { top: clamp(44%, 46vh, 48%); left: clamp(18%, 20vw, 22%); }
+.b21 { top: clamp(72%, 75vh, 78%); left: clamp(1%, 2vw, 3%); }
+
+/* Responsive pour les très grands écrans */
+@media (min-width: 1920px) {
+  .thanks-wrapper {
+    min-height: 700px;
+  }
+  
+  .bubble {
+    font-size: 20px;
+    padding: 12px 24px;
+  }
+}
+
+/* Responsive pour les tablettes */
+@media (max-width: 1024px) {
+  .thanks-wrapper {
+    min-height: 450px;
+  }
+  
+  .thanks-main {
+    padding: 40px 0;
+  }
+}
+
+/* Responsive pour les mobiles */
+@media (max-width: 768px) {
+  .thanks-footer {
+    padding: 40px 15px 60px;
+  }
+  
+  .thanks-wrapper {
+    min-height: 400px;
+  }
+  
+  .thanks-main {
+    padding: 30px 0;
+  }
+  
+  /* Réajustement des positions pour mobiles */
+  .b1  { top: 3%; left: 2%; }
+  .b2  { top: 12%; left: 1%; }
+  .b3  { top: 10%; left: 15%; }
+  .b4  { top: 25%; left: 5%; }
+  .b5  { top: 42%; left: 2%; }
+  .b6  { top: 62%; left: 6%; }
+  .b7  { top: 72%; left: 18%; }
+  .b8  { top: 6%; left: 30%; }
+  .b9  { top: 18%; left: 35%; }
+  .b10 { top: 4%; left: 52%; }
+  .b11 { top: 16%; left: 62%; }
+  .b12 { top: 30%; left: 58%; }
+  .b13 { top: 46%; left: 70%; }
+  .b14 { top: 64%; left: 66%; }
+  .b15 { top: 14%; left: 80%; }
+  .b16 { top: 36%; left: 84%; }
+  .b17 { top: 56%; left: 82%; }
+  .b18 { top: 68%; left: 43%; }
+  .b19 { top: 60%; left: 26%; }
+  .b20 { top: 46%; left: 20%; }
+  .b21 { top: 75%; left: 2%; }
+}
+
+/* Responsive pour les très petits mobiles */
+@media (max-width: 480px) {
+  .thanks-footer {
+    padding: 30px 10px 50px;
+  }
+  
+  .thanks-wrapper {
+    min-height: 350px;
+  }
+  
+  .thanks-main {
+    padding: 20px 0;
+  }
+  
+  .bubble {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+  
+  /* Réajustement des positions pour très petits mobiles */
+  .b1  { top: 4%; left: 1%; }
+  .b2  { top: 14%; left: 0%; }
+  .b3  { top: 11%; left: 12%; }
+  .b4  { top: 27%; left: 3%; }
+  .b5  { top: 44%; left: 1%; }
+  .b6  { top: 64%; left: 4%; }
+  .b7  { top: 74%; left: 15%; }
+  .b8  { top: 7%; left: 28%; }
+  .b9  { top: 19%; left: 32%; }
+  .b10 { top: 5%; left: 50%; }
+  .b11 { top: 17%; left: 60%; }
+  .b12 { top: 32%; left: 56%; }
+  .b13 { top: 48%; left: 68%; }
+  .b14 { top: 66%; left: 64%; }
+  .b15 { top: 15%; left: 78%; }
+  .b16 { top: 38%; left: 82%; }
+  .b17 { top: 58%; left: 80%; }
+  .b18 { top: 70%; left: 41%; }
+  .b19 { top: 62%; left: 24%; }
+  .b20 { top: 48%; left: 18%; }
+  .b21 { top: 77%; left: 1%; }
+}
